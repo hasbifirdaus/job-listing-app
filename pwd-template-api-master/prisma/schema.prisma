@@ -77,13 +77,13 @@ enum PaymentMethod {
 // CORE TABLES
 // -----------------------------------------------------------
 model Users {
-  id                Int       @id @default(autoincrement())
-  role              UserRole
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role              UserRole  @default(JOB_SEEKER)
   name              String    @db.VarChar(100)
   email             String    @unique @db.VarChar(100)
   password          String    @db.VarChar(255)
-  dob               DateTime
-  gender            Gender
+  dob               DateTime?
+  gender            Gender?
   education         String?   @db.VarChar(100)
   address           String?
   profile_image_url String?   @db.VarChar(255)
@@ -100,14 +100,14 @@ model Users {
   interviews            Interviews[]           @relation("InterviewChangedBy")
   subscriptions         Subscriptions[]
   approvedSubscriptions Subscriptions[]        @relation("ApprovedBy")
-  skills                UserSkills[] // <--- tambahkan relasi balik
+  skills                UserSkills[]
 
   @@index([deleted_at])
 }
 
 model UserAuthProviders {
   id            Int      @id @default(autoincrement())
-  user_id       Int
+  user_id       String   @db.Uuid
   provider_name String   @db.VarChar(50)
   provider_id   String   @db.VarChar(255)
   created_at    DateTime @default(now())
@@ -137,7 +137,7 @@ model Companies {
 }
 
 model CompanyAdmins {
-  user_id    Int
+  user_id    String   @db.Uuid
   company_id Int
   is_primary Boolean @default(false)
   role       String  @db.VarChar(50)
@@ -240,7 +240,7 @@ model JobTags {
 model Applications {
   id                Int               @id @default(autoincrement())
   job_id            Int
-  user_id           Int
+  user_id           String            @db.Uuid
   test_id           Int?
   cv_url            String?           @db.VarChar(255)
   cover_letter      String?
@@ -267,7 +267,7 @@ model ApplicationHistories {
   application_id  Int
   previous_status ApplicationStatus
   new_status      ApplicationStatus
-  changed_by      Int
+  changed_by      String            @db.Uuid
   notes           String?
   deleted_at      DateTime?
   changed_at      DateTime          @default(now())
@@ -290,7 +290,7 @@ model Interviews {
   deleted_at     DateTime?
   created_at     DateTime        @default(now())
   updated_at     DateTime        @updatedAt
-  changed_by     Int?
+  changed_by     String?         @db.Uuid
 
   application Applications @relation(fields: [application_id], references: [id])
   user        Users?       @relation("InterviewChangedBy", fields: [changed_by], references: [id])
@@ -313,12 +313,12 @@ model SubscriptionPlans {
 
 model Subscriptions {
   id          Int                @id @default(autoincrement())
-  user_id     Int
+  user_id     String             @db.Uuid
   plan_id     Int
   status      SubscriptionStatus @default(PENDING)
   start_date  DateTime
   end_date    DateTime
-  approved_by Int?
+  approved_by String?            @db.Uuid
   deleted_at  DateTime?
   created_at  DateTime           @default(now())
   updated_at  DateTime           @updatedAt
@@ -396,7 +396,7 @@ model PreSelectionAnswers {
 // MANY-TO-MANY RELATIONSHIPS
 // -----------------------------------------------------------
 model UserSkills {
-  user_id    Int
+  user_id    String   @db.Uuid
   tag_id     Int
   created_at DateTime @default(now())
 
