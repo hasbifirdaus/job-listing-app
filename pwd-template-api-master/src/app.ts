@@ -1,6 +1,12 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import authRoutes from "./routers/auth/auth.routes";
+import preSelectionRoutes from "./routers/preSelection/preSelection.routes";
+import jobRoutes from "./routers/job/job.routes";
+import tagRoutes from "./routers/tag/tag.routes";
+import categoryRoutes from "./routers/category/category.routes";
+import provinceRoutes from "./routers/province/province.routes";
+import cityRoutes from "./routers/city/city.routes";
 
 const app = express();
 
@@ -13,6 +19,12 @@ app.use(
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/tags", tagRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/province", provinceRoutes);
+app.use("/api/city", cityRoutes);
+app.use("/api/job", jobRoutes);
+app.use("/api/preselection", preSelectionRoutes);
 
 //Error handler middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
