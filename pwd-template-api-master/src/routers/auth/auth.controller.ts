@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
-import { registerUser, loginUser } from "../auth/auth.service";
+import { registerService, loginService } from "../auth/auth.service";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, name, role } = req.body;
-    const user = await registerUser({ email, password, name, role });
-    res.status(201).json({ message: "User registered", user });
+    const user = await registerService(req.body);
+    res.status(201).json({ message: "User registered successfully", user });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
@@ -13,9 +12,8 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-    const result = await loginUser(email, password);
-    res.status(200).json(result);
+    const token = await loginService(req.body);
+    res.status(200).json({ message: "Login successfull", token });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
