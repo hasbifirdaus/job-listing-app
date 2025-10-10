@@ -8,6 +8,7 @@ import categoryRoutes from "./routers/category/category.routes";
 import provinceRoutes from "./routers/province/province.routes";
 import cityRoutes from "./routers/city/city.routes";
 import applicationsRoutes from "./routers/applications/applications.routes";
+import applicantRoutes from "./routers/applicant-management/applicant.routes";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/city", cityRoutes);
 app.use("/api/job", jobRoutes);
 app.use("/api/preselection", preSelectionRoutes);
 app.use("/api/applyjob", applicationsRoutes);
+app.use("/api/applicantmanagement", applicantRoutes);
 
 //Error handler middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
