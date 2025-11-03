@@ -1,24 +1,21 @@
 import prisma from "../../lib/config/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Users, UserRole } from "../../generated/prisma";
+import { UserRole } from "../../generated/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET_KEY is not defined in .env");
 }
-//Register
+
 export const registerService = async (data: any) => {
   const { name, email, password, role } = data;
 
-  //cek apakah email sudah terdaftar
   const existingUser = await prisma.users.findUnique({ where: { email } });
   if (existingUser) throw new Error("Email already registered");
 
-  //hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  //buat user
   const newUser = await prisma.users.create({
     data: {
       name,
@@ -28,29 +25,40 @@ export const registerService = async (data: any) => {
     },
   });
 
-  //jika user adalah COMPANY_ADMIN
+  let newCompany = null;
   if (role === UserRole.COMPANY_ADMIN) {
-    const company = await prisma.companies.create({
+    const existingCompany = await prisma.companies.findUnique({
+      where: { email },
+    });
+    if (existingCompany)
+      throw new Error("Company with this email already exists");
+
+    newCompany = await prisma.companies.create({
       data: {
         name: `${name}'s Company`,
-        email,
+        email: email,
         phone: "000000000000",
         location: "Indonesia",
-        admins: {
-          create: {
-            user_id: newUser.id,
-            is_primary: true,
-            role: "Owner",
-          },
-        },
+        description: "Default company created upon registration.",
       },
     });
-    return { user: newUser, company };
+
+    await prisma.companyAdmins.create({
+      data: {
+        user_id: newUser.id,
+        company_id: newCompany.id,
+        is_primary: true,
+        role: "Owner",
+      },
+    });
   }
-  return { user: newUser };
+  return {
+    message: "Registration successfull",
+    user: newUser,
+    company: newCompany,
+  };
 };
 
-//Login
 export const loginService = async (data: any) => {
   const { email, password } = data;
 
