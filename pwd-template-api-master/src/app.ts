@@ -10,6 +10,7 @@ import cityRoutes from "./routers/city/city.routes";
 import applicationsRoutes from "./routers/applications/applications.routes";
 import applicantRoutes from "./routers/applicant-management/applicant.routes";
 import interviewRoutes from "./routers/interview/interview.routes";
+import analyticsRoutes from "./routers/website-analytics/analytics.routes";
 import { scheduleInterviewReminder } from "./lib/cron/interviewReminder";
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/preselection", preSelectionRoutes);
 app.use("/api/applyjob", applicationsRoutes);
 app.use("/api/applicantmanagement", applicantRoutes);
 app.use("/api/interview", interviewRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 scheduleInterviewReminder();
 
